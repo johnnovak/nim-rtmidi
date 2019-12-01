@@ -74,7 +74,7 @@ type
 
 
 type
-  RtMidiCallback* = proc (timeStamp: cdouble, message: ptr UncheckedArray[byte],
+  RtMidiCallback* = proc (deltaTime: cdouble, message: ptr UncheckedArray[byte],
                           messageSize: csize, userData: pointer) {.cdecl.}
 
 proc getCompiledApi*(apis: ptr MidiApi, apisSize: cuint): cint
@@ -159,5 +159,4 @@ proc portCount*(device: RtMidiWrapperPtr): cuint
 
 proc portName*(device: RtMidiWrapperPtr, portNumber: cuint): cstring
   {.rtMidiImport, cdecl, importc: "rtmidi_get_port_name".}
-
 

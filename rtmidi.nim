@@ -13,8 +13,8 @@ type
   MidiIn*  = ref MidiInObj
   MidiOut* = ref MidiOutObj
 
-type
-  MidiInCallback* = proc (timeStamp: float, message: openArray[byte])
+#type
+#  MidiInCallback* = proc (timeStamp: float, message: openArray[byte]) {.closure.}
 
 type
   RtMidiError* = object of Exception
@@ -31,7 +31,7 @@ template withHandleError(m: MidiIO, body: untyped): auto =
   handleError(m)
 
 
-var g_MidiInCallbackInternal: wrapper.RtMidiCallback
+#var g_MidiInCallbackInternal: wrapper.RtMidiCallback
 
 # General
 
@@ -80,15 +80,16 @@ proc openVirtualPort*(m: MidiIn,
                       portName: string = "RtMidi Input") = withHandleError(m):
   wrapper.openVirtualPort(m, portName)
 
-proc setCallback*(m: MidiIn, callback: MidiInCallback) = withHandleError(m):
-  g_MidiInCallbackInternal = proc (timeStamp: cdouble,
-                                   message: ptr UncheckedArray[byte],
-                                   messageSize: csize,
-                                   userData: pointer) {.cdecl.} =
-
-    callback(timeStamp, toOpenArray(message, 0, messageSize))
-
-  wrapper.setCallback(m, g_MidiInCallbackInternal, nil)
+proc setCallback*(m: MidiIn, callback: RtMidiCallback) = withHandleError(m):
+#  g_MidiInCallbackInternal = proc (deltaTime: cdouble,
+#                                   message: ptr UncheckedArray[byte],
+#                                   messageSize: csize,
+#                                   userData: pointer) {.cdecl.} =
+#
+#    callback(timeStamp, toOpenArray(message, 0, messageSize))
+#
+#  wrapper.setCallback(m, g_MidiInCallbackInternal, nil)
+  wrapper.setCallback(m, callback, nil)
 
 proc cancelCallback*(m: MidiIn) = withHandleError(m):
   wrapper.cancelCallback(m)
