@@ -75,22 +75,25 @@ proc midiInCallback(deltaTime: cdouble, message: ptr UncheckedArray[byte],
 
 proc clockIn() =
   let midiIn = createDefaultMidiIn()
-  if chooseInputPort(midiIn):
+  if not chooseInputPort(midiIn):
     midiIn.close()
     quit(1)
 
   midiIn.setCallback(midiInCallback)
   midiIn.ignoreTypes(false, false, false)
 
-  echo "Reading MIDI input... Press any key to quit."
-  discard getch()
+  echo "Reading MIDI input... Press Q to quit."
+  var c: char
+  while c != 'q':
+    sleep(10)
+    c = getch()
 
   midiIn.close()
 
 
 proc clockOut() =
   let midiOut = createDefaultMidiOut()
-  if chooseOutputPort(midiOut):
+  if not chooseOutputPort(midiOut):
     midiOut.close()
     quit(1)
 
