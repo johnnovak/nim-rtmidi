@@ -10,8 +10,8 @@ MIDI input/output across the following operating systems:
 * Mac OS X (CoreMIDI, JACK)
 * Windows (Multimedia Library)
 
-The wrapper supports both static and dynamic linking and provides a pleasant
-Nim interface to the functions provided by the C API.
+The wrapper provides a pleasant Nim interface to the functions provided by the
+C API.
 
 For more information please refer to the [official RtMidi
 tutorial](https://www.music.mcgill.ca/~gary/rtmidi/index.html#license) and
@@ -36,21 +36,29 @@ nimble install rtmidi
 Compile and run any of the examples by running the following command
 in the [examples](/examples) directory:
 ~~~
-nim c -r -d:rtMidiStaticLib <example>
+nim c -r <example>
 ~~~
 
-Alternatively, you can invoke the `examplesStatic` or `examples` (for dynamic
-linking) nimble task in the project root directory to compile all examples:
+Alternatively, you can invoke the `examples` nimble task in the project root
+directory to compile all examples:
 
 ```
-nimble examplesStatic
+nimble examples
 ```
 
-### Statically linking to RtMidi
+### Selecting the target API
 
-To link statically to RtMidi (the C sources are bundled within the module),
-define the conditional symbol `rtMidiStaticLib` (`-d:rtMidiStaticLib` or
-`--define:rtMidiStaticLib`).
+On Windows, the Windows Multimedia Library is always used so there's no need
+to configure anything.
+
+On OS X, the symbols `rtMidiCore` or `rtMidiJack` need to be provided to
+indicate which API(s) to compile the library for (note that only CoreMIDI has
+been tested).
+
+On Linux, the symbols `rtMidiAlsa` or `rtMidiJack` need to be provided to
+indicate which API(s) to compile the library for (note that Linux has not been
+tested at all).
+
 
 ## Documentation
 

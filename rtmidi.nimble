@@ -13,8 +13,3 @@ task examples, "Compiles the examples with dynamic linking":
   exec "nim c examples/apinames"
   exec "nim c examples/midiout"
   exec "nim c examples/midiprobe"
-
-task examplesStatic, "Compiles the examples with static linking":
-  exec "nim c -d:rtMidiStaticLib examples/apinames"
-  exec "nim c -d:rtMidiStaticLib examples/midiout"
-  exec "nim c -d:rtMidiStaticLib examples/midiprobe"

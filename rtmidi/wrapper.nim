@@ -1,40 +1,43 @@
-when not defined(rtMidiStaticLib):
-  when defined(windows):
-    const RtMidiDll = "rtmidi4.dll"
-  elif defined(macosx):
-    const RtMidiDll = "librtmidi4.dylib"
+when defined(windows):
+  when defined rtMidiAlsa:
+    {.error: "ALSA is not supported on Windows".}
+  when defined rtMidiJack:
+    {.error: "JACK is not supported on Windows".}
+  when defined rtMidiCore:
+    {.error: "CoreMIDI is not supported on Windows".}
+
+  {.passC: "-D__WINDOWS_MM__", passL: "-lstdc++ -lwinmm",
+    compile: "src/RtMidi.cpp",
+    compile: "src/rtmidi_c.cpp".}
+
+elif defined(macosx):
+  when defined rtMidiCore:
+    {.passC: "-D__MACOSX_CORE__ ",
+      passL: "-framework CoreMIDI -framework CoreAudio -framework CoreFoundation".}
+  when defined rtMidiJack:
+    {.passC: "-D__UNIX_JACK__", passL: "-ljack".}
+  when defined rtMidiAlsa:
+    {.error: "ALSA is not supported on OS X".}
+
+  {.passL: "-lstdc++",
+    compile: "rtmidi/src/RtMidi.cpp",
+    compile: "rtmidi/src/rtmidi_c.cpp".}
+
+elif defined(linux):
+  when defined rtMidiCore:
+    {.error: "CoreMIDI is not supported on Linux".}
+  when defined(rtMidiAlsa):
+    {.passC: "-D__LINUX_ALSA__", passL: "-lasound -lpthread".}
+  elif defined(rtMidiJack):
+    {.passC: "-D__UNIX_JACK__", passL: "-ljack".}
   else:
-    const RtMidiDll = "librtmidi.so.4"
+    {.error: "define rtMidiAlsa or rtMidiJack (pass -d:... to compile)".}
 
-  {.pragma: rtMidiImport, dynlib: RtMidiDll.}
+  {.passL: "-lstdc++",
+    compile: "rtmidi/src/RtMidi.cpp",
+    compile: "rtmidi/src/rtmidi_c.cpp".}
 
-  {.deadCodeElim: on.}
-
-else:
-  when defined(windows):
-    {.passC: "-std=gnu++11 -D__WINDOWS_MM__", passL: "-lstdc++ -lwinmm",
-      compile: "src/RtMidi.cpp",
-      compile: "src/rtmidi_c.cpp".}
-
-  elif defined(macosx):
-    {.passC: "-std=gnu++11 -D__MACOSX_CORE__",
-      passL: "-framework CoreMIDI -framework CoreAudio -framework CoreFoundation",
-      compile: "rtmidi/src/RtMidi.cpp",
-      compile: "rtmidi/src/rtmidi_c.cpp".}
-
-  elif defined(linux):
-    when defined(rtMidiAlsa):
-      {.passC: "-std=gnu++11 -D__LINUX_ALSA__", passL: "-lstdc++ -lasound -lpthread",
-        compile: "rtmidi/src/RtMidi.cpp",
-        compile: "rtmidi/src/rtmidi_c.cpp".}
-    elif defined(rtMidiJack):
-      {.passC: "-std=gnu++11 -D__UNIX_JACK__", passL: "-lstdc++ -ljack",
-        compile: "rtmidi/src/RtMidi.cpp",
-        compile: "rtmidi/src/rtmidi_c.cpp".}
-    else:
-      {.error: "define rtMidiAlsa or rtMidiJack (pass -d:... to compile)".}
-
-  {.pragma: rtMIdiImport.}
+{.pragma: rtMIdiImport.}
 
 
 type
